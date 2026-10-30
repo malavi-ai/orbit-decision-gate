@@ -9,11 +9,11 @@ On a phone or laptop, choose **Add to Home Screen** or **Install** to use it as 
 
 | Step | Question | What the app does |
 |---|---|---|
-| 1. Screen | Worth reviewing? | Six yes/no warning flags (market, inventory, operations, liquidity, financing, capital). Score = share of observed warnings; withheld if fewer than 4 domains are observable. |
-| 2. Decision gate | Is a requirement at risk, and by when? | Headroom = usable capacity − requirement at the due date, for each discrepancy separately and for all together. |
-| 3. Response | Which policy costs least? | Compares the expected cost of monitoring, targeted inquiry (cost of the question and of waiting) and immediate action, and selects the lowest. |
+| 1. Screen | Worth reviewing? | Six yes/no warning flags (market, inventory, operations, liquidity, financing, capital). Score S = share of observed warnings; withheld if fewer than 4 domains are observable. **Referral rule:** refer to the gate when S ≥ ⅔ (4 of 6, 4 of 5 or 3 of 4). |
+| 2. Decision gate | Is a requirement at risk, and by when? | Usable resources = cash + operating inflows + credit, where credit counts only if usable before the due date (30- and 90-day horizons). Headroom = usable resources − requirement, for each discrepancy separately, in the **base case**, and in an **adverse case** with operating inflows reduced by 20%. |
+| 3. Response | Monitor, inquire or act? | **Protocol rule (Table 3):** positive headroom in both cases → Monitor; positive in the base case but negative in the adverse case, or evidence incomplete → Targeted inquiry; negative in the base case → Compare interventions. An expected-loss comparison (Section 3.10) is shown alongside. |
 
-Three illustrative cases are included: a joint shortfall, a later cost, and ample headroom.
+Four illustrative cases are included: credit that arrives too late (A), credit in time (B), a thin margin (C) and a joint shortfall (D).
 
 ## Scope
 

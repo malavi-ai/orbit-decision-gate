@@ -88,6 +88,10 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 .choice.win{border:3px solid var(--green)}
 .choice small{color:var(--muted);font-size:13px}
 .verdict{font-family:var(--display);font-weight:700;font-size:21px;margin:0}
+.rule{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper)}
+.rule .lab{font-size:12px;letter-spacing:.1em;font-weight:700;color:var(--gold)}
+.rule .res{font-family:var(--display);font-weight:700;font-size:20px}
+.proto{border:3px solid var(--orange)}
 .check{display:flex;gap:8px;align-items:center;color:var(--ink)}
 footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
 @media (max-width:640px){.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}}
@@ -102,18 +106,19 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 <header>
   <div class="eyebrow">ORBIT · Constraint-gated framework · Conceptual procedure</div>
   <h1>ORBIT Decision Gate</h1>
-  <p class="lede">When should a warning signal lead to monitoring, targeted inquiry or corrective action? The procedure below follows Figure 1 and Section 3.10 of the paper. Enter figures or load an illustrative case.</p>
+  <p class="lede">When should a warning signal lead to monitoring, targeted inquiry or corrective action? The procedure below follows Figure 1 and Sections 3.9–3.11 of the paper. Enter figures or load an illustrative case.</p>
   <div class="flow" aria-hidden="true">
-    <div class="box y"><span class="k">1 · SCREEN</span><span class="t">Worth reviewing?</span><span class="s">Six warning flags · ≥4 observable</span></div><span class="arrow">→</span>
-    <div class="box o"><span class="k">2 · DECISION GATE</span><span class="t">Requirement at risk?</span><span class="s">Headroom · due date · shortfall</span></div><span class="arrow">→</span>
+    <div class="box y"><span class="k">1 · SCREEN</span><span class="t">Worth reviewing?</span><span class="s">Six warning flags · ≥4 observable · refer if ≥ ⅔</span></div><span class="arrow">→</span>
+    <div class="box o"><span class="k">2 · DECISION GATE</span><span class="t">Requirement at risk?</span><span class="s">Resources · timing · base and adverse case</span></div><span class="arrow">→</span>
     <div class="box g"><span class="k">3 · RESPONSE</span><span class="t">Choose policy</span><span class="s">Monitor · Targeted inquiry · Act</span></div>
   </div>
   <div class="loop">Revisit as new evidence arrives</div>
   <div class="presets" role="group" aria-label="Examples">
     <span>Illustrative cases (invented values):</span>
-    <button id="exA" class="on">Case A · Joint shortfall</button>
-    <button id="exB">Case B · Later cost</button>
-    <button id="exC">Case C · Ample headroom</button>
+    <button id="exA" class="on">Case A · Credit arrives too late</button>
+    <button id="exB">Case B · Credit in time</button>
+    <button id="exC">Case C · Thin margin</button>
+    <button id="exD">Case D · Joint shortfall</button>
   </div>
 </header>
 
@@ -123,7 +128,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
     <div class="eq"><span>S(f,t) = Σ w<sub>p</sub>q<sub>p</sub> / Σ w<sub>p</sub>, over observed conditions p</span><span class="ref">Section 3.9</span></div>
     <div class="domains" id="domains"></div>
     <div class="out"><div><div class="note">Screening score</div><div class="big" id="score">–</div></div><div id="cov" class="note"></div></div>
-    <p class="note">The score is the share of observed warnings. It shows that warnings occur together. It does not show the cause or how serious the problem is. A score is given only when at least four of the six domains are observable.</p>
+    <div class="rule"><span class="lab">REFERRAL RULE · S ≥ ⅔</span><span class="res" id="refer">–</span><span class="note" id="referWhy"></span></div>
+    <p class="note">The score is the share of observed warnings. It shows that warnings occur together. It does not show the cause or how serious the problem is. A score is given only when at least four of the six domains are observable. A firm is referred to the decision gate when S ≥ ⅔: 4 of 6, 4 of 5 or 3 of 4 observed domains. A referral below this threshold requires a documented, specific obligation and is recorded separately.</p>
   </div>
 </section>
 
@@ -132,27 +138,34 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="body">
     <div class="eq"><span>H<sub>r</sub>(τ,ω) = U<sub>r</sub>(τ,ω) − R<sub>r</sub>(τ,ω)</span><span class="ref">Eq. (1)</span></div>
     <div class="grid2">
-      <label for="U">Usable cash or capacity by the due date (€)<input type="number" id="U" step="1000"></label>
       <label for="R">Requirement due (payment or delivery, €)<input type="number" id="R" step="1000"></label>
       <label for="D">Days until the due date<input type="number" id="D" min="0" step="1"></label>
+      <label for="U">Cash on hand (€)<input type="number" id="U" step="1000"></label>
+      <label for="I">Operating inflows expected before the due date (€)<input type="number" id="I" step="1000"></label>
+      <label for="L">Credit or financing available (€)<input type="number" id="L" step="1000"></label>
+      <label for="LD">Days until the credit is usable<input type="number" id="LD" min="0" step="1"></label>
     </div>
     <div class="disc">
       <div class="note">Discrepancies that reduce usable cash before the due date</div>
       <div id="discs"></div>
       <div><button id="addD">Add discrepancy</button></div>
     </div>
+    <div class="rule"><span class="lab">TIMING</span><span class="note" id="timing"></span></div>
     <div class="tw"><table>
       <thead><tr><th>View</th><th class="n">Headroom</th><th>Status</th></tr></thead>
       <tbody id="htab"></tbody>
     </table></div>
-    <p class="note">Headroom = usable capacity − requirement, at the due date. Checking each discrepancy one at a time can miss a shortfall that appears when they are counted together.</p>
+    <p class="note">Headroom = usable resources − requirement, at the due date. A resource counts only if it is usable before the due date. Money and physical capacity are never added together. The adverse case reduces the operating inflows still expected by 20%. Checking each discrepancy one at a time can miss a shortfall that appears when they are counted together.</p>
   </div>
 </section>
 
 <section class="step s3" aria-labelledby="h3s">
   <div class="head"><span class="num">STEP 3</span><h2 id="h3s">Response</h2><span class="q">Monitor, targeted inquiry, or act: which costs least?</span></div>
   <div class="body">
-    <div class="eq"><span>Choose the feasible policy with the lowest expected loss: M, A or Q<sub>i</sub></span><span class="ref">Eqs. (2)–(4)</span></div>
+    <div class="rule proto"><span class="lab">PROTOCOL RULE · TABLE 3</span><span class="res" id="proto">–</span><span class="note" id="protoWhy"></span></div>
+    <label class="check" for="incOn"><input type="checkbox" id="incOn"> Evidence is incomplete (a key fact is missing)</label>
+    <p class="note">Monitor: headroom positive in the base and adverse case. Targeted inquiry: positive in the base case but negative in the adverse case, or evidence incomplete. Compare interventions: negative in the base case with a material consequence. The comparison below shows the expected-loss view.</p>
+    <div class="eq"><span>Compare responses by expected loss: M, A or Q<sub>i</sub></span><span class="ref">Section 3.10 · Eqs. (2)–(4)</span></div>
     <div class="grid2">
       <label for="C">Cost of missing the requirement (€)<input type="number" id="C" step="500"></label>
       <label for="a">Cost of the short-term action (€)<input type="number" id="a" step="500"></label>
@@ -174,7 +187,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   </div>
 </section>
 
-<footer>Illustration of the decision rule in the conceptual ORBIT paper (Section 3.10). All example values are invented to show the logic. This is not an empirically validated model. When probabilities or costs cannot be defended, the paper recommends a robust rule and stated scenario bounds instead of a single expected value.</footer>
+<footer>Illustration of the decision rule in the conceptual ORBIT paper (Sections 3.9–3.11). All example values are invented to show the logic. This is not an empirically validated model. When probabilities or costs cannot be defended, the paper recommends a robust rule and stated scenario bounds instead of a single expected value.</footer>
 </div>
 
 <script>
@@ -182,9 +195,10 @@ const DOMAINS=[
  ["Market","Revenue change"],["Inventory","Inventory days"],["Operations","Operating margin change"],
  ["Liquidity","Accessible cash vs near-term bills"],["Financing","Debt due soon"],["Capital","Capex and asset renewal"]];
 const EX={
- A:{flags:[0,1,0,1,0,0],U:100000,R:95000,D:7,discs:[["Delayed customer receipts",4000],["Unplanned inventory purchase",4000]],C:12000,a:2000,g:15000,p:0,F:0,r:0,ask:false,k:0,w:0},
- B:{flags:[0,0,1,0,0,1],U:120000,R:80000,D:7,discs:[],C:12000,a:2000,g:15000,p:0.5,F:20000,r:3000,ask:true,k:1000,w:0},
- C:{flags:[1,1,0,0,0,0],U:200000,R:80000,D:30,discs:[["Seasonal dip in receipts",10000]],C:12000,a:2000,g:15000,p:0,F:0,r:0,ask:false,k:0,w:0}
+ A:{flags:[1,1,0,1,1,0],U:30000,I:25000,L:35000,LD:45,R:80000,D:30,discs:[],inc:false,C:60000,a:3000,g:40000,p:0,F:0,r:0,ask:false,k:0,w:0},
+ B:{flags:[1,0,1,1,1,-1],U:30000,I:25000,L:35000,LD:15,R:80000,D:30,discs:[],inc:false,C:60000,a:3000,g:40000,p:0,F:0,r:0,ask:false,k:0,w:0},
+ C:{flags:[0,1,1,1,-1,-1],U:30000,I:25000,L:28000,LD:15,R:80000,D:30,discs:[],inc:false,C:12000,a:2000,g:15000,p:0.3,F:10000,r:2000,ask:true,k:500,w:0},
+ D:{flags:[1,1,0,1,1,0],U:50000,I:400000,L:0,LD:0,R:80000,D:7,discs:[["Customer payment delayed",400000]],inc:false,C:60000,a:3000,g:40000,p:0,F:0,r:0,ask:false,k:0,w:0}
 };
 let st={};
 const $=id=>document.getElementById(id);
@@ -216,9 +230,9 @@ function renderDiscs(){
 }
 function load(k){
   const e=JSON.parse(JSON.stringify(EX[k]));st=e;
-  ["U","R","D","C","a","g","p","F","r","k","w"].forEach(id=>$(id).value=e[id]);
-  $("askOn").checked=e.ask;
-  ["exA","exB","exC"].forEach(id=>$(id).classList.toggle("on",id==="ex"+k));
+  ["U","I","L","LD","R","D","C","a","g","p","F","r","k","w"].forEach(id=>$(id).value=e[id]);
+  $("askOn").checked=e.ask;$("incOn").checked=e.inc;
+  ["exA","exB","exC","exD"].forEach(id=>$(id).classList.toggle("on",id==="ex"+k));
   renderDomains();renderDiscs();calc();
 }
 function calc(){
@@ -226,14 +240,27 @@ function calc(){
   const obs=st.flags.filter(f=>f!==-1), yes=obs.filter(f=>f===1).length;
   if(obs.length>=4){$("score").textContent=(yes/obs.length).toFixed(2);$("cov").textContent=`${yes} warning${yes===1?"":"s"} out of ${obs.length} observed domains.`;}
   else{$("score").textContent="Withheld";$("cov").textContent=`Only ${obs.length} of 6 domains observed. At least 4 are needed.`;}
+  if(obs.length<4){$("refer").textContent="No score";$("referWhy").textContent="Coverage too low for a rule-based referral.";}
+  else{const need=Math.ceil(obs.length*2/3-1e-9);const ok=yes>=need;$("refer").textContent=ok?"Refer to the decision gate":"No referral · keep monitoring";$("referWhy").textContent=`${need} of ${obs.length} warnings needed; ${yes} observed.`;}
   // Step 2
-  const U=num("U"),R=num("R"),D=num("D");
+  const cash=num("U"),I=num("I"),L=num("L"),LD=num("LD"),R=num("R"),D=num("D");
+  const credOK=L>0&&LD<=D, U=cash+I+(credOK?L:0);
+  const hz=D<=30?"30-day horizon":(D<=90?"90-day horizon":"beyond the 90-day horizon");
+  $("timing").textContent=`Due in ${D} day${D===1?"":"s"} (${hz}). `+(L>0?(credOK?`Credit of ${eur(L)} is usable in ${LD} days, before the due date: it counts.`:`Credit of ${eur(L)} is usable only in ${LD} days, after the due date: it does not count.`):"No credit entered.");
   const base=U-R, tot=st.discs.reduce((s,d)=>s+(+d[1]||0),0), H=base-tot;
   const st_=h=>h<0?'<span class="pill bad">Shortfall</span>':(h<0.05*Math.max(R,1)?'<span class="pill mid">Thin</span>':'<span class="pill ok">Covered</span>');
-  let rows=`<tr><td>Before discrepancies</td><td class="n">${eur(base)}</td><td>${st_(base)}</td></tr>`;
+  let rows=st.discs.length?`<tr><td>Before discrepancies</td><td class="n">${eur(base)}</td><td>${st_(base)}</td></tr>`:"";
   st.discs.forEach(d=>{const h=base-(+d[1]||0);rows+=`<tr><td>Only “${d[0]||"discrepancy"}”</td><td class="n">${eur(h)}</td><td>${st_(h)}</td></tr>`});
-  if(st.discs.length) rows+=`<tr><td><strong>All together</strong> (due in ${D} day${D===1?"":"s"})</td><td class="n"><strong>${eur(H)}</strong></td><td>${st_(H)}</td></tr>`;
+  const adv=H-0.2*Math.max(0,I-tot);
+  rows+=`<tr><td><strong>Base case</strong>${st.discs.length?" (all discrepancies)":""}</td><td class="n"><strong>${eur(H)}</strong></td><td>${st_(H)}</td></tr>`;
+  rows+=`<tr><td><strong>Adverse case</strong> (operating inflows −20%)</td><td class="n"><strong>${eur(adv)}</strong></td><td>${st_(adv)}</td></tr>`;
   $("htab").innerHTML=rows;
+  const inc=$("incOn").checked;
+  let pr,pw;
+  if(H<0){pr="Compare interventions";pw=`Headroom is negative in the base case (${eur(H)}).`;}
+  else if(adv<0||inc){pr="Targeted inquiry";pw=adv<0?`Positive in the base case (${eur(H)}) but negative in the adverse case (${eur(adv)}).`:"Headroom is positive, but evidence is incomplete.";}
+  else{pr="Monitor";pw=`Positive in both cases: base ${eur(H)}, adverse ${eur(adv)}.`;}
+  $("proto").textContent=pr;$("protoWhy").textContent=pw;
   // Step 3
   const C=num("C"),a=num("a"),g=num("g"),p=Math.min(1,Math.max(0,num("p"))),F=num("F"),r=num("r"),k=num("k"),w=num("w"),askOn=$("askOn").checked;
   const miss=h=>h<0?C:0, later=p*F;
@@ -255,10 +282,10 @@ function calc(){
   $("verdict").textContent=`ORBIT selects: ${win.t}.`;
   $("why").textContent=next?`${win.t} costs ${eur(next.c-win.c)} less than ${next.t.toLowerCase()}.`+(H<0&&win.key==="watch"?" The requirement is at risk, but every available response costs more than the shortfall.":""):"Only one response is available.";
 }
-["U","R","D","C","a","g","p","F","r","k","w"].forEach(id=>$(id).addEventListener("input",calc));
-$("askOn").addEventListener("change",calc);
+["U","I","L","LD","R","D","C","a","g","p","F","r","k","w"].forEach(id=>$(id).addEventListener("input",calc));
+$("askOn").addEventListener("change",calc);$("incOn").addEventListener("change",calc);
 $("addD").onclick=()=>{st.discs.push(["New discrepancy",1000]);renderDiscs();calc()};
-$("exA").onclick=()=>load("A");$("exB").onclick=()=>load("B");$("exC").onclick=()=>load("C");
+$("exA").onclick=()=>load("A");$("exB").onclick=()=>load("B");$("exC").onclick=()=>load("C");$("exD").onclick=()=>load("D");
 load("A");
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
 </script>
